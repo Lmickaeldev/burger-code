@@ -1,14 +1,14 @@
 <?php
-
+    //recuperation de l'acces a la bdd
     require 'database.php';
-
+    // id est t'il vide 'string'
     if (!empty($_GET['id'])) {
         $id = checkInput($_GET['id']);
     }
-
+    //variable pour erreur lors du post
     $nameError = $descriptionError = $priceError = $categoryError = $imageError = $name = $description = $price = $category = $image = "";
 
-    if (!empty($_POST)) {
+    if (!empty($_POST)) {//submit pour modifier
         $name               = checkInput($_POST['name']);
         $description        = checkInput($_POST['description']);
         $price              = checkInput($_POST['price']);
@@ -17,20 +17,20 @@
         $imagePath          = '../images/'. basename($image);
         $imageExtension     = pathinfo($imagePath,PATHINFO_EXTENSION);
         $isSuccess          = true;
-       
-        if (empty($name)) {
+       //validation du form
+        if (empty($name)) {//si nom vide
             $nameError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         }
-        if (empty($description)) {
+        if (empty($description)) {//si description vide
             $descriptionError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         } 
-        if (empty($price)) {
+        if (empty($price)) {//si prix vide
             $priceError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         }  
-        if (empty($category)) {
+        if (empty($category)) {//si categorie non selectioné
             $categoryError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         }
@@ -39,38 +39,42 @@
         } else {
             $isImageUpdated = true;
             $isUploadSuccess =true;
+            //si extenssion n'est pas bonne
             if ($imageExtension != "jpg" && $imageExtension != "png" && $imageExtension != "jpeg" && $imageExtension != "gif" ) {
                 $imageError = "Les fichiers autorises sont: .jpg, .jpeg, .png, .gif";
                 $isUploadSuccess = false;
             }
+            //si le nom existe deja
             if (file_exists($imagePath)) {
                 $imageError = "Le fichier existe deja";
                 $isUploadSuccess = false;
             }
+            //si l'image est superieur a 5mb
             if ($_FILES["image"]["size"] > 500000) {
                 $imageError = "Le fichier ne doit pas depasser les 500KB";
                 $isUploadSuccess = false;
             }
             if ($isUploadSuccess) {
+                //si false condition d'erreur
                 if (!move_uploaded_file($_FILES["image"]["tmp_name"], $imagePath)) {
                     $imageError = "Il y a eu une erreur lors de l'upload";
                     $isUploadSuccess = false;
                 } 
             } 
         }
-         
+         //modfier la base de donné 
         if (($isSuccess && $isImageUpdated && $isUploadSuccess) || ($isSuccess && !$isImageUpdated)) { 
             $db = Database::connect();
             if ($isImageUpdated) {
                 $statement = $db->prepare("UPDATE items  set name = ?, description = ?, price = ?, category = ?, image = ? WHERE id = ?");
                 $statement->execute(array($name,$description,$price,$category,$image,$id));
-            } else {
+            } else {//si l'image n'a pas été modifier
                 $statement = $db->prepare("UPDATE items  set name = ?, description = ?, price = ?, category = ? WHERE id = ?");
                 $statement->execute(array($name,$description,$price,$category,$id));
             }
             Database::disconnect();
             header("Location: index.php");
-            
+            //si l'image update mais upload succes est faux
         } else if ($isImageUpdated && !$isUploadSuccess) {
             $db = Database::connect();
             $statement = $db->prepare("SELECT * FROM items where id = ?");
@@ -80,7 +84,7 @@
             Database::disconnect();
            
         }
-    } else {
+    } else {//afficher les valeurs bdd  
         $db = Database::connect();
         $statement = $db->prepare("SELECT * FROM items where id = ?");
         $statement->execute(array($id));
@@ -92,7 +96,7 @@
         $image          = $item['image'];
         Database::disconnect();
     }
-
+    // sécurité des donnés 
     function checkInput($data) {
       $data = trim($data);
       $data = stripslashes($data);
@@ -110,7 +114,6 @@
     <title>Burger Code</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
         <link href='http://fonts.googleapis.com/css?family=Holtwood+One+SC' rel='stylesheet' type='text/css'>

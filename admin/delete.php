@@ -1,6 +1,7 @@
 <?php
+    // appel de la bdd
     require 'database.php';
- 
+    
     if (!empty($_GET['id'])) {
         $id = checkInput($_GET['id']);
     }
@@ -13,7 +14,7 @@
         Database::disconnect();
         header("Location: index.php"); 
     }
-
+    //securité
     function checkInput($data) {
       $data = trim($data);
       $data = stripslashes($data);

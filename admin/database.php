@@ -1,4 +1,5 @@
 <?php
+// connection avec pdo + verification erreur 
 class Database
 {
     
@@ -10,7 +11,7 @@ class Database
     private static $connection = null;
 
     public static function connect()
-    {
+    {   //verification erreur
         try 
         {
             self::$connection = new PDO("mysql:host=" . self::$dbHost . ";dbname=" . self::$dbName,self::$dbUser,self::$dbUserPassword);

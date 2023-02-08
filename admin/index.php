@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
+<!-- partie html pour le visuel -->
 <html>
     <head>
         <title>Burger Code</title>
@@ -27,12 +28,17 @@
                     </tr>
                   </thead>
                   <tbody>
+                    <!-- partie php pour inserer les donné via la bdd -->
                       <?php
+                      // recuperer la bdd
                         require 'database.php';
+                        //connecté pour utliser la bdd  
                         $db = Database::connect();
+                        //requete sql
                         $statement = $db->query('SELECT items.id, items.name, items.description, items.price, categories.name AS category 
                                                 FROM items LEFT JOIN categories ON items.category = categories.id 
                                                 ORDER BY items.id DESC');
+                        //affiché (recuperer juste une ligne via fetch boucle pour relancé)
                         while($item = $statement->fetch()) {
                             echo '<tr>';
                             echo '<td>'. $item['name'] . '</td>';
@@ -48,6 +54,7 @@
                             echo '</td>';
                             echo '</tr>';
                         }
+                        //deconection de la bdd
                         Database::disconnect();
                       ?>
                   </tbody>
